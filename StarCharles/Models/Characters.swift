@@ -30,48 +30,14 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import Foundation
 
-struct CharactersView: View {
-  @ObservedObject var viewModel: ViewModel
-  var film: Film?
-
-  var body: some View {
-    List(viewModel.characters) { character in
-      NavigationLink(destination: FilmView(viewModel: viewModel, character: character, title: character.name)) {
-        CharactersListItemView(character: character)
-      }
-    }
-    .onAppear {
-      if let film = film {
-        for item in film.characters {
-          viewModel.fetchCharacter(urlString: item)
-        }
-      } else {
-        viewModel.fetchCharacters()
-        return
-      }
-    }
-    .onDisappear {
-      viewModel.characters.removeAll()
-    }
-    .navigationTitle(Text("Characters"))
-  }
+struct Characters {
+  let results: [Character]
 }
-struct CharactersListItemView: View {
-  var character: Character
 
-  var body: some View {
-    VStack(alignment: .leading) {
-      Text("\(character.name)")
-        .font(.headline)
-        .padding(.bottom, 10)
-      Text("Gender: \(character.gender ?? "N/A")")
-        .font(.subheadline)
-      Text("Hair Color: \(character.hairColor ?? "N/A")")
-        .font(.subheadline)
-      Text("Eye Color: \(character.eyeColor ?? "N/A")")
-        .font(.subheadline)
-    }.padding()
+extension Characters: Decodable {
+  enum CodingKeys: String, CodingKey {
+    case results
   }
 }

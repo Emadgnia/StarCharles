@@ -30,48 +30,55 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import Foundation
+import Combine
 
-struct CharactersView: View {
-  @ObservedObject var viewModel: ViewModel
-  var film: Film?
-
-  var body: some View {
-    List(viewModel.characters) { character in
-      NavigationLink(destination: FilmView(viewModel: viewModel, character: character, title: character.name)) {
-        CharactersListItemView(character: character)
-      }
-    }
-    .onAppear {
-      if let film = film {
-        for item in film.characters {
-          viewModel.fetchCharacter(urlString: item)
-        }
-      } else {
-        viewModel.fetchCharacters()
-        return
-      }
-    }
-    .onDisappear {
-      viewModel.characters.removeAll()
-    }
-    .navigationTitle(Text("Characters"))
-  }
+/// Defines the Network service errors.
+enum NetworkError: Error {
+  case invalidRequest
+  case invalidResponse
+  case dataLoadingError(statusCode: Int, data: Data)
+  case jsonDecodingError(error: Error)
+  case clientError(statusCode: Int, data: Data)
+  case serverError(statusCode: Int, data: Data)
 }
-struct CharactersListItemView: View {
-  var character: Character
 
-  var body: some View {
-    VStack(alignment: .leading) {
-      Text("\(character.name)")
-        .font(.headline)
-        .padding(.bottom, 10)
-      Text("Gender: \(character.gender ?? "N/A")")
-        .font(.subheadline)
-      Text("Hair Color: \(character.hairColor ?? "N/A")")
-        .font(.subheadline)
-      Text("Eye Color: \(character.eyeColor ?? "N/A")")
-        .font(.subheadline)
-    }.padding()
+
+struct NetworkService {
+  func request<InputType: Decodable>(input: InputType.Type, url: URL) -> AnyPublisher<InputType, NetworkError> {
+    var request = URLRequest(url: url, timeoutInterval: 60)
+    request.allHTTPHeaderFields = [
+      "Content-Type": "application/json",
+      "cache-control": "no-cache"
+    ]
+    let config = URLSessionConfiguration.default
+    config.requestCachePolicy = .reloadIgnoringLocalCacheData
+    config.urlCache = nil
+    return URLSession(configuration: config)
+      .dataTaskPublisher(for: request)
+      .receive(on: DispatchQueue.main)
+      .tryMap { response in
+        guard let statusCode = (response.response as? HTTPURLResponse)?.statusCode else {
+          throw NetworkError.invalidResponse
+        }
+        switch statusCode {
+        case 200...300:
+          return response.data
+        case 400...499:
+          throw NetworkError.clientError(statusCode: statusCode, data: response.data)
+        case 500...600:
+          throw NetworkError.serverError(statusCode: statusCode, data: response.data)
+        default:
+          throw NetworkError.invalidRequest
+        }
+      }
+      .decode(type: InputType.self, decoder: JSONDecoder())
+      .mapError { error -> NetworkError in
+        guard let result = (error as? NetworkError)  else {
+          return NetworkError.jsonDecodingError(error: error)
+        }
+        return result
+      }
+      .eraseToAnyPublisher()
   }
 }

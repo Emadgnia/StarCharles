@@ -30,48 +30,55 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import Foundation
 
-struct CharactersView: View {
-  @ObservedObject var viewModel: ViewModel
-  var film: Film?
+struct Character: Identifiable {
+  var id = UUID()
+  let name: String
+  let height: String?
+  let mass: String?
+  let hairColor: String?
+  let skinColor: String?
+  let eyeColor: String?
+  let birthYear: String?
+  let gender: String?
+  let homeworld: String?
+  let films: [String]?
+  let species: [String]?
+  let vehicles: [String]?
+  let starships: [String]?
+  let created: String?
+  let edited: String?
+  let url: String
+}
 
-  var body: some View {
-    List(viewModel.characters) { character in
-      NavigationLink(destination: FilmView(viewModel: viewModel, character: character, title: character.name)) {
-        CharactersListItemView(character: character)
-      }
-    }
-    .onAppear {
-      if let film = film {
-        for item in film.characters {
-          viewModel.fetchCharacter(urlString: item)
-        }
-      } else {
-        viewModel.fetchCharacters()
-        return
-      }
-    }
-    .onDisappear {
-      viewModel.characters.removeAll()
-    }
-    .navigationTitle(Text("Characters"))
+extension Character: Hashable {
+  static func == (lhs: Character, rhs: Character) -> Bool {
+    return lhs.id == rhs.id
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
   }
 }
-struct CharactersListItemView: View {
-  var character: Character
 
-  var body: some View {
-    VStack(alignment: .leading) {
-      Text("\(character.name)")
-        .font(.headline)
-        .padding(.bottom, 10)
-      Text("Gender: \(character.gender ?? "N/A")")
-        .font(.subheadline)
-      Text("Hair Color: \(character.hairColor ?? "N/A")")
-        .font(.subheadline)
-      Text("Eye Color: \(character.eyeColor ?? "N/A")")
-        .font(.subheadline)
-    }.padding()
+extension Character: Decodable {
+  enum CodingKeys: String, CodingKey {
+    case name
+    case height
+    case mass
+    case hairColor = "hair_color"
+    case skinColor = "skin_color"
+    case eyeColor = "eye_color"
+    case birthYear = "birth_year"
+    case gender
+    case homeworld
+    case films
+    case species
+    case vehicles
+    case starships
+    case created
+    case edited
+    case url
   }
 }

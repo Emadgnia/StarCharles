@@ -30,48 +30,49 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import Foundation
 
-struct CharactersView: View {
-  @ObservedObject var viewModel: ViewModel
-  var film: Film?
+struct Film: Identifiable {
+  var id = UUID()
+  let title: String
+  let episodeId: Int
+  let openingCrawl: String
+  let director: String
+  let producer: String
+  let species: [String]
+  let starships: [String]
+  let vehicles: [String]
+  let characters: [String]
+  let planets: [String]
+  let url: String
+  let created: String
+  let edited: String
+}
 
-  var body: some View {
-    List(viewModel.characters) { character in
-      NavigationLink(destination: FilmView(viewModel: viewModel, character: character, title: character.name)) {
-        CharactersListItemView(character: character)
-      }
-    }
-    .onAppear {
-      if let film = film {
-        for item in film.characters {
-          viewModel.fetchCharacter(urlString: item)
-        }
-      } else {
-        viewModel.fetchCharacters()
-        return
-      }
-    }
-    .onDisappear {
-      viewModel.characters.removeAll()
-    }
-    .navigationTitle(Text("Characters"))
+extension Film: Hashable {
+  static func == (lhs: Film, rhs: Film) -> Bool {
+    return lhs.episodeId == rhs.episodeId
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(episodeId)
   }
 }
-struct CharactersListItemView: View {
-  var character: Character
 
-  var body: some View {
-    VStack(alignment: .leading) {
-      Text("\(character.name)")
-        .font(.headline)
-        .padding(.bottom, 10)
-      Text("Gender: \(character.gender ?? "N/A")")
-        .font(.subheadline)
-      Text("Hair Color: \(character.hairColor ?? "N/A")")
-        .font(.subheadline)
-      Text("Eye Color: \(character.eyeColor ?? "N/A")")
-        .font(.subheadline)
-    }.padding()
+extension Film: Decodable {
+  enum CodingKeys: String, CodingKey {
+    case title
+    case episodeId = "episode_id"
+    case openingCrawl = "opening_crawl"
+    case director
+    case producer
+    case species
+    case starships
+    case vehicles
+    case characters
+    case planets
+    case url
+    case created
+    case edited
   }
 }
