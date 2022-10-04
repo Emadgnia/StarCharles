@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "modelpackage",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:Emadgnia/ModelPackage.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "971b32b8e8b44d8e8332f2415baa158965aaabdc"
+      }
+    },
+    {
+      "identity" : "networkingpackage",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:Emadgnia/NetworkingPackage.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6fe426b55a69bd45a44e6fbbd6d44d0a5cd50ec1"
+      }
+    }
+  ],
+  "version" : 2
+}
