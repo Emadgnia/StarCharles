@@ -33,6 +33,7 @@
 import Combine
 import SwiftUI
 import ModelPackage
+import NetworkingFramework
 class ViewModel: ObservableObject {
   @Published var films: [Film] = []
   @Published var characters: [Character] = []
