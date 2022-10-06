@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,56 +30,14 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import Foundation
-import Combine
+#import <Foundation/Foundation.h>
 
-/// Defines the Network service errors.
-public enum NetworkError: Error {
-  case invalidRequest
-  case invalidResponse
-  case dataLoadingError(statusCode: Int, data: Data)
-  case jsonDecodingError(error: Error)
-  case clientError(statusCode: Int, data: Data)
-  case serverError(statusCode: Int, data: Data)
-}
+//! Project version number for NetworkingFramework.
+FOUNDATION_EXPORT double NetworkingFrameworkVersionNumber;
+
+//! Project version string for NetworkingFramework.
+FOUNDATION_EXPORT const unsigned char NetworkingFrameworkVersionString[];
+
+// In this header, you should import all the public headers of your framework using statements like #import <NetworkingFramework/PublicHeader.h>
 
 
-public struct NetworkService {
-    public init() {}
-  public func request<InputType: Decodable>(input: InputType.Type, url: URL) -> AnyPublisher<InputType, NetworkError> {
-    var request = URLRequest(url: url, timeoutInterval: 60)
-    request.allHTTPHeaderFields = [
-      "Content-Type": "application/json",
-      "cache-control": "no-cache"
-    ]
-    let config = URLSessionConfiguration.default
-    config.requestCachePolicy = .reloadIgnoringLocalCacheData
-    config.urlCache = nil
-    return URLSession(configuration: config)
-      .dataTaskPublisher(for: request)
-      .receive(on: DispatchQueue.main)
-      .tryMap { response in
-        guard let statusCode = (response.response as? HTTPURLResponse)?.statusCode else {
-          throw NetworkError.invalidResponse
-        }
-        switch statusCode {
-        case 200...300:
-          return response.data
-        case 400...499:
-          throw NetworkError.clientError(statusCode: statusCode, data: response.data)
-        case 500...600:
-          throw NetworkError.serverError(statusCode: statusCode, data: response.data)
-        default:
-          throw NetworkError.invalidRequest
-        }
-      }
-      .decode(type: InputType.self, decoder: JSONDecoder())
-      .mapError { error -> NetworkError in
-        guard let result = (error as? NetworkError)  else {
-          return NetworkError.jsonDecodingError(error: error)
-        }
-        return result
-      }
-      .eraseToAnyPublisher()
-  }
-}
