@@ -31,7 +31,7 @@
 /// THE SOFTWARE.
 
 import SwiftUI
-
+import ModelPackage
 struct CharactersView: View {
   @ObservedObject var viewModel: ViewModel
   var film: Film?

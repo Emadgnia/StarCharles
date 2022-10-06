@@ -32,12 +32,53 @@
 
 import Foundation
 
-struct Characters {
-  let results: [Character]
+public struct Character: Identifiable {
+    public var id = UUID()
+    public let name: String
+  let height: String?
+  let mass: String?
+    public   let hairColor: String?
+  let skinColor: String?
+    public   let eyeColor: String?
+  let birthYear: String?
+    public   let gender: String?
+  let homeworld: String?
+    public  let films: [String]?
+  let species: [String]?
+  let vehicles: [String]?
+  let starships: [String]?
+  let created: String?
+  let edited: String?
+  let url: String
 }
 
-extension Characters: Decodable {
+extension Character: Hashable {
+    public static func == (lhs: Character, rhs: Character) -> Bool {
+    return lhs.id == rhs.id
+  }
+
+    public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+}
+
+extension Character: Decodable {
   enum CodingKeys: String, CodingKey {
-    case results
+    case name
+    case height
+    case mass
+    case hairColor = "hair_color"
+    case skinColor = "skin_color"
+    case eyeColor = "eye_color"
+    case birthYear = "birth_year"
+    case gender
+    case homeworld
+    case films
+    case species
+    case vehicles
+    case starships
+    case created
+    case edited
+    case url
   }
 }

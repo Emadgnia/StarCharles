@@ -32,12 +32,12 @@
 
 import Foundation
 
-struct Films {
-  let results: [Film]
+public struct Characters {
+    public let results: [Character]
 }
 
-extension Films: Decodable {
-  enum CodingKeys: String, CodingKey {
+extension Characters: Decodable {
+    enum CodingKeys: String, CodingKey {
     case results
   }
 }

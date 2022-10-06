@@ -32,47 +32,11 @@
 
 import Foundation
 
-struct Film: Identifiable {
-  var id = UUID()
-  let title: String
-  let episodeId: Int
-  let openingCrawl: String
-  let director: String
-  let producer: String
-  let species: [String]
-  let starships: [String]
-  let vehicles: [String]
-  let characters: [String]
-  let planets: [String]
-  let url: String
-  let created: String
-  let edited: String
+public enum Options: String, CaseIterable {
+  case films = "Films"
+  case characters = "Characters"
 }
 
-extension Film: Hashable {
-  static func == (lhs: Film, rhs: Film) -> Bool {
-    return lhs.episodeId == rhs.episodeId
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(episodeId)
-  }
-}
-
-extension Film: Decodable {
-  enum CodingKeys: String, CodingKey {
-    case title
-    case episodeId = "episode_id"
-    case openingCrawl = "opening_crawl"
-    case director
-    case producer
-    case species
-    case starships
-    case vehicles
-    case characters
-    case planets
-    case url
-    case created
-    case edited
-  }
+extension Options: Identifiable {
+    public var id: String { rawValue }
 }

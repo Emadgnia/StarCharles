@@ -32,53 +32,47 @@
 
 import Foundation
 
-struct Character: Identifiable {
-  var id = UUID()
-  let name: String
-  let height: String?
-  let mass: String?
-  let hairColor: String?
-  let skinColor: String?
-  let eyeColor: String?
-  let birthYear: String?
-  let gender: String?
-  let homeworld: String?
-  let films: [String]?
-  let species: [String]?
-  let vehicles: [String]?
-  let starships: [String]?
-  let created: String?
-  let edited: String?
+public struct Film: Identifiable {
+    public var id = UUID()
+    public  let title: String
+  let episodeId: Int
+  let openingCrawl: String
+    public  let director: String
+    public  let producer: String
+  let species: [String]
+  let starships: [String]
+  let vehicles: [String]
+    public   let characters: [String]
+  let planets: [String]
   let url: String
+  let created: String
+  let edited: String
 }
 
-extension Character: Hashable {
-  static func == (lhs: Character, rhs: Character) -> Bool {
-    return lhs.id == rhs.id
+extension Film: Hashable {
+    public static func == (lhs: Film, rhs: Film) -> Bool {
+    return lhs.episodeId == rhs.episodeId
   }
 
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
+    public func hash(into hasher: inout Hasher) {
+    hasher.combine(episodeId)
   }
 }
 
-extension Character: Decodable {
-  enum CodingKeys: String, CodingKey {
-    case name
-    case height
-    case mass
-    case hairColor = "hair_color"
-    case skinColor = "skin_color"
-    case eyeColor = "eye_color"
-    case birthYear = "birth_year"
-    case gender
-    case homeworld
-    case films
+extension Film: Decodable {
+    public enum CodingKeys: String, CodingKey {
+    case title
+    case episodeId = "episode_id"
+    case openingCrawl = "opening_crawl"
+    case director
+    case producer
     case species
-    case vehicles
     case starships
+    case vehicles
+    case characters
+    case planets
+    case url
     case created
     case edited
-    case url
   }
 }

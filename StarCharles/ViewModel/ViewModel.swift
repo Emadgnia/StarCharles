@@ -32,7 +32,7 @@
 
 import Combine
 import SwiftUI
-
+import ModelPackage
 class ViewModel: ObservableObject {
   @Published var films: [Film] = []
   @Published var characters: [Character] = []

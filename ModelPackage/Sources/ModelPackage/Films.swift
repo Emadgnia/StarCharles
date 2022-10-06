@@ -32,11 +32,12 @@
 
 import Foundation
 
-enum Options: String, CaseIterable {
-  case films = "Films"
-  case characters = "Characters"
+public struct Films {
+    public let results: [Film]
 }
 
-extension Options: Identifiable {
-  var id: String { rawValue }
+extension Films: Decodable {
+    public enum CodingKeys: String, CodingKey {
+        case results
+  }
 }
